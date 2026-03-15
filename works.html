@@ -246,6 +246,29 @@
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+  /* Footer */
+  .footer {
+    margin-top: 40px;
+    text-align: center;
+    animation: fadeIn 1.2s ease 1s both;
+  }
+  .footer-tag {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--red-dim);
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .copylight {
+    margin-top: 6px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--dark); }
@@ -421,6 +444,11 @@
       </div>
 
     </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-tag">◆ ◆ ◆</div>
+    <div class="copylight">© ぱふす。 ALL rights reserved.</div>
   </div>
 
 </div>
