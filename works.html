@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#ぱふすのつくったの</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #ff1a2e;
+    --red-dim: #cc0016;
+    --red-glow: rgba(255,26,46,0.4);
+    --teal: #00e5cc;
+    --teal-glow: rgba(0,229,204,0.3);
+    --orange: #ff7700;
+    --dark: #0a0508;
+    --card-bg: rgba(20,8,10,0.85);
+    --text: #f0d0d4;
+    --text-dim: #a07880;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--dark);
+    color: var(--text);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .scanline {
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+    pointer-events: none; z-index: 50;
+  }
+  .noise {
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 49; opacity: 0.5;
+  }
+
+  .bg-blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+  .bg-blob-1 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,26,46,0.18) 0%, transparent 70%); top: -100px; left: -100px; animation: blobMove1 8s ease-in-out infinite alternate; }
+  .bg-blob-2 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,229,204,0.12) 0%, transparent 70%); bottom: 100px; right: -50px; animation: blobMove2 10s ease-in-out infinite alternate; }
+  .bg-blob-3 { width: 250px; height: 250px; background: radial-gradient(circle, rgba(255,119,0,0.1) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); animation: blobMove3 12s ease-in-out infinite alternate; }
+  @keyframes blobMove1 { to { transform: translate(40px, 60px); } }
+  @keyframes blobMove2 { to { transform: translate(-30px, -40px); } }
+  @keyframes blobMove3 { to { transform: translate(-50px, 30px); } }
+
+  .grid-bg {
+    position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,26,46,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,26,46,0.04) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+
+  /* Corner decorations */
+  .corner-deco { position: fixed; z-index: 200; pointer-events: none; }
+  .corner-deco svg { display: block; }
+  .corner-tl { top: 0; left: 0; }
+  .corner-tr { top: 0; right: 0; transform: scaleX(-1); }
+  .corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
+  .corner-br { bottom: 0; right: 0; transform: scale(-1); }
+
+  /* Back button */
+  .back-btn {
+    position: relative;
+    z-index: 60;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid rgba(255,26,46,0.2);
+    background: var(--card-bg);
+    transition: color 0.3s, border-color 0.3s;
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+    margin-bottom: 28px;
+    align-self: flex-start;
+  }
+  .back-btn:hover { color: var(--red); border-color: var(--red); }
+
+  /* Main container */
+  .container {
+    position: relative;
+    z-index: 55;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Page title */
+  .page-title {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-weight: 900;
+    font-size: 1.6rem;
+    letter-spacing: 0.05em;
+    color: #fff;
+    text-shadow: 0 0 20px var(--red-glow), 0 0 40px rgba(255,26,46,0.2);
+    margin-bottom: 36px;
+    text-align: center;
+    animation: fadeInDown 0.7s ease both;
+  }
+  .page-title .hash { color: var(--red); }
+
+  /* Section */
+  .section {
+    width: 100%;
+    margin-bottom: 48px;
+    animation: fadeInUp 0.7s ease both;
+  }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.2s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    color: #fff;
+  }
+  .section-title .hash { color: var(--teal); }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,229,204,0.4), transparent);
+  }
+
+  .section-desc {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    letter-spacing: 0.03em;
+  }
+
+  /* Playlist link */
+  .playlist-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--teal);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid rgba(0,229,204,0.3);
+    background: rgba(0,229,204,0.05);
+    margin-bottom: 20px;
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    letter-spacing: 0.03em;
+  }
+  .playlist-link:hover {
+    background: rgba(0,229,204,0.1);
+    border-color: rgba(0,229,204,0.6);
+    box-shadow: 0 0 14px rgba(0,229,204,0.2);
+  }
+  .playlist-link svg { flex-shrink: 0; }
+
+  /* Video grid */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .video-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,26,46,0.12);
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    animation: fadeInUp 0.5s ease both;
+  }
+  .video-card:hover {
+    border-color: rgba(255,26,46,0.35);
+    box-shadow: 0 0 20px rgba(255,26,46,0.08);
+  }
+
+  /* nth-child delays */
+  .video-card:nth-child(1) { animation-delay: 0.1s; }
+  .video-card:nth-child(2) { animation-delay: 0.15s; }
+  .video-card:nth-child(3) { animation-delay: 0.2s; }
+  .video-card:nth-child(4) { animation-delay: 0.25s; }
+  .video-card:nth-child(5) { animation-delay: 0.3s; }
+  .video-card:nth-child(6) { animation-delay: 0.35s; }
+
+  .video-embed {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: #000;
+  }
+  .video-embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-info {
+    padding: 10px 14px 12px;
+  }
+
+  .video-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+
+  /* Divider */
+  .divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 36px;
+    animation: fadeIn 1s ease 0.4s both;
+  }
+  .divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--red-dim), transparent); }
+  .divider-icon { font-size: 0.6rem; font-family: 'Orbitron', monospace; color: var(--red-dim); letter-spacing: 0.2em; white-space: nowrap; }
+
+  /* Animations */
+  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--red-dim); }
+
+  @media (max-width: 500px) {
+    .video-grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+<div class="noise"></div>
+<div class="grid-bg"></div>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="bg-blob bg-blob-3"></div>
+
+<!-- Corner decorations -->
+<div class="corner-deco corner-tl">
+  <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+    <path d="M0 0 H40 V4 H4 V40 H0 Z" fill="#ff1a2e" opacity="0.5"/>
+    <rect x="44" y="0" width="8" height="8" fill="#00e5cc" opacity="0.6"/>
+    <rect x="0" y="44" width="8" height="8" fill="#ff7700" opacity="0.6"/>
+  </svg>
+</div>
+<div class="corner-deco corner-tr">
+  <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+    <path d="M0 0 H40 V4 H4 V40 H0 Z" fill="#ff1a2e" opacity="0.5"/>
+    <rect x="44" y="0" width="8" height="8" fill="#00e5cc" opacity="0.6"/>
+    <rect x="0" y="44" width="8" height="8" fill="#ff7700" opacity="0.6"/>
+  </svg>
+</div>
+<div class="corner-deco corner-bl">
+  <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+    <path d="M0 0 H40 V4 H4 V40 H0 Z" fill="#ff1a2e" opacity="0.5"/>
+    <rect x="44" y="0" width="8" height="8" fill="#00e5cc" opacity="0.6"/>
+    <rect x="0" y="44" width="8" height="8" fill="#ff7700" opacity="0.6"/>
+  </svg>
+</div>
+<div class="corner-deco corner-br">
+  <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+    <path d="M0 0 H40 V4 H4 V40 H0 Z" fill="#ff1a2e" opacity="0.5"/>
+    <rect x="44" y="0" width="8" height="8" fill="#00e5cc" opacity="0.6"/>
+    <rect x="0" y="44" width="8" height="8" fill="#ff7700" opacity="0.6"/>
+  </svg>
+</div>
+
+<div class="container">
+
+  <a class="back-btn" href="index.html">
+    ◀ BACK
+  </a>
+
+  <div class="page-title"><span class="hash">#</span>ぱふすのつくったの</div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <span class="divider-icon">◆ WORKS ◆</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Section 1: 歌ってみたオリジナルMV -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title"><span class="hash">#</span>歌ってみたオリジナルMV</div>
+      <div class="section-line"></div>
+    </div>
+    <p class="section-desc">本業動画クリエイターによる副業制作です。ご相談はXまたはdiscordからおねがいします！</p>
+
+    <a class="playlist-link" href="https://youtube.com/playlist?list=PLefbFMC4AbudTM6s60yS2sE-AAAcNy5b2&si=ofn8CIHAXkkCrJWm" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+      最新のプレイリストはこちら
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M5 12l14 0M14 7l5 5-5 5"/></svg>
+    </a>
+
+    <div class="video-grid">
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/72PalbJtruo" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">鹿ノ子・うたぴ / PPPP</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/mwPQ9gEoHeI" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">鹿ノ子 / ミカヅキ</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/COoMCGMtpBQ" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">うたぴ / pray</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/mN63wnhBFc4" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">鹿ノ子 / UNDEAD</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/rbq64aoHtt8" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">やまふぁ / chukey</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/TqUQRO2JZAU" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">しーせん・のえる。 / 革命デュアリズム</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Section 2: きりぬき -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title"><span class="hash">#</span>ぱふすのきりぬき</div>
+      <div class="section-line"></div>
+    </div>
+    <p class="section-desc">人のは作りません。あそびです。たのしいね！</p>
+
+    <div class="video-grid">
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/EF_7nqP98dM" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">優勝記念キル集(りあばろ部：VALORANTゴールド以下大会)</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/tySits6BN-M" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">サイファー愛シーン集</div>
+        </div>
+      </div>
+
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe src="https://www.youtube.com/embed/Ux5Xwg-2o5g" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="video-info">
+          <div class="video-label">サブスク解禁記念VALORANTシーン集</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
